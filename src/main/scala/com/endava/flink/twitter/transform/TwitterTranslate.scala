@@ -1,4 +1,4 @@
-package com.endava.flink.twitter.function
+package com.endava.flink.twitter.transform
 
 import java.util
 
