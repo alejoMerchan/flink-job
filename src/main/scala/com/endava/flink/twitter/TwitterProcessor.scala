@@ -1,22 +1,19 @@
 package com.endava.flink.twitter
 
-import java.util.Properties
-
-import com.endava.flink.twitter.function.TwitterTranslate
-import com.endava.flink.twitter.sink.MongoSink
-import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
-import org.apache.flink.api.common.serialization.SimpleStringSchema
+import com.endava.flink.twitter.config.KafkaConfigurations
+import com.endava.flink.twitter.sink.DataMongoSink
+import com.endava.flink.twitter.source.KafkaSource
+import com.endava.flink.twitter.transform.DataTranslate
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
-object TwitterProcessor {
+object TwitterProcessor extends DataTranslate with KafkaConfigurations with KafkaSource with DataMongoSink {
 
 
   def main(args: Array[String]): Unit = {
 
     // set up the streaming execution environment
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    implicit val env = StreamExecutionEnvironment.getExecutionEnvironment
 
     /**
       * Event time and watermarks:
@@ -27,18 +24,24 @@ object TwitterProcessor {
       */
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
-    val properties = new Properties()
-    properties.setProperty("bootstrap.servers", "localhost:9092")
-    properties.setProperty("group.id", "test")
-    properties.setProperty("zookeeper.connect", "localhost:2181")
+    val process = for {
+      kafkaConfig <- getConfig("")
+      source <- getSource(kafkaConfig)
+      translate <- toTransform(source)
+      sink <- sink(translate)
+    } yield sink
 
+    process.attempt.map {
+      case Left(e1) =>
+        e1 match {
+          case jobException: JobException => println(jobException.getMsgException())
+          case _ => println("other exception")
+        }
+      case Right(_) => println("sucess execution")
+    }.unsafeRunSync()
 
-    val kafkaData: DataStream[String] = env.addSource(new FlinkKafkaConsumer[String]("eventos-prueba", new SimpleStringSchema(), properties))
-
-    kafkaData.map(new TwitterTranslate).addSink(MongoSink(MongoSinkConfig("", "twitter-endava", "tweets"))).setParallelism(1)
 
     env.execute("twitter processor app")
-
   }
 
 
