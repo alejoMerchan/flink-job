@@ -12,12 +12,12 @@ class InfluxSink(config: InfluxSinkConfig) extends RichSinkFunction[InfluxDBPoin
   var influxClient: InfluxDB = _
 
   override def open(parameters: Configuration): Unit = {
-    influxClient = InfluxDB.connect("localhost", 8086)
+    influxClient = InfluxDB.connect(config.url, 8086)
   }
 
   override def invoke(event: InfluxDBPoint, context: SinkFunction.Context[_]): Unit = {
 
-    val database = influxClient.selectDatabase("influx_database")
+    val database = influxClient.selectDatabase(config.database)
 
     val point = Point(event.measurement, event.timestamp)
 

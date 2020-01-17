@@ -7,10 +7,12 @@ import com.endava.flink.twitter.transform.DataTranslate
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 
-object TwitterProcessor extends DataTranslate with KafkaConfigurations with KafkaSource with DataMongoSink {
-
-
-  def main(args: Array[String]): Unit = {
+object TwitterProcessor
+  extends App
+    with DataTranslate
+    with KafkaConfigurations
+    with KafkaSource
+    with DataMongoSink {
 
     // set up the streaming execution environment
     implicit val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -37,12 +39,8 @@ object TwitterProcessor extends DataTranslate with KafkaConfigurations with Kafk
           case jobException: JobException => println(jobException.getMsgException())
           case _ => println("other exception")
         }
-      case Right(_) => println("sucess execution")
+      case Right(_) => println("success execution")
     }.unsafeRunSync()
 
-
     env.execute("twitter processor app")
-  }
-
-
 }
