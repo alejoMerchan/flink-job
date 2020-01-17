@@ -1,11 +1,12 @@
-package com.endava.flink.twitter.sink
+package com.endava.flink.twitter.sink.mongo
 
 import cats.effect.IO
 import com.endava.flink.twitter.JobException
 import com.endava.flink.twitter.model.TwitterEvent
-import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
+import com.endava.flink.twitter.sink.DataSink
+import com.endava.flink.twitter.sink.mongo.MongoSink.MongoSinkConfig
 import org.apache.flink.streaming.api.datastream.DataStreamSink
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.scala.DataStream
 
 trait DataMongoSink extends DataSink[TwitterEvent, DataStreamSink[TwitterEvent]] {
 

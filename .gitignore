@@ -1,5 +1,6 @@
 # Default ignored files
 /.idea/workspace.xml
+dependency-reduced-pom.xml
 logs
 target
 /.idea

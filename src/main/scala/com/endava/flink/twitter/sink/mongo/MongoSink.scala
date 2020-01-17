@@ -1,8 +1,8 @@
-package com.endava.flink.twitter.sink
+package com.endava.flink.twitter.sink.mongo
 
 import com.endava.flink.twitter.model.TwitterEvent
 import com.endava.flink.twitter.mongo.model.{MongoModel, TwitterEventMongo}
-import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
+import com.endava.flink.twitter.sink.mongo.MongoSink.MongoSinkConfig
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 import org.mongodb.scala.{Completed, MongoClient, MongoCollection, Observable, Observer}

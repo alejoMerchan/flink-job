@@ -1,7 +1,7 @@
 package com.endava.flink.twitter
 
 import com.endava.flink.twitter.config.KafkaConfigurations
-import com.endava.flink.twitter.sink.DataMongoSink
+import com.endava.flink.twitter.sink.mongo.DataMongoSink
 import com.endava.flink.twitter.source.KafkaSource
 import com.endava.flink.twitter.transform.DataTranslate
 import org.apache.flink.streaming.api.TimeCharacteristic
