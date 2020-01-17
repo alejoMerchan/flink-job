@@ -178,6 +178,19 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-metrics-influxdb -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-metrics-influxdb_2.12</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.paulgoldbaum/scala-influxdb-client -->
+        <dependency>
+            <groupId>com.paulgoldbaum</groupId>
+            <artifactId>scala-influxdb-client_2.12</artifactId>
+            <version>0.6.1</version>
+        </dependency>
 
     </dependencies>
 
