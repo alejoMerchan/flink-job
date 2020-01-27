@@ -7,7 +7,7 @@ import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
 import org.apache.flink.streaming.api.datastream.DataStreamSink
 import org.apache.flink.streaming.api.scala._
 
-trait DataMongoSink extends DataSink[TwitterEvent, DataStreamSink[TwitterEvent]] {
+trait DataMongoSink extends DataSink[TwitterEvent, DataStreamSink[TwitterEvent], MongoSinkConfig] {
 
   case class DataMongoSinkException(msg: String, exception: Throwable) extends JobException {
     override def getMsgException(): String = msg
@@ -15,9 +15,9 @@ trait DataMongoSink extends DataSink[TwitterEvent, DataStreamSink[TwitterEvent]]
     override def getException(): Throwable = exception
   }
 
-  override def sink(stream: DataStream[TwitterEvent]): IO[DataStreamSink[TwitterEvent]] = {
+  override def sink(stream: DataStream[TwitterEvent],config:MongoSinkConfig): IO[DataStreamSink[TwitterEvent]] = {
     IO {
-      stream.addSink(MongoSink(MongoSinkConfig("", "twitter-endava", "tweets"))).setParallelism(1)
+      stream.addSink(MongoSink(config)).setParallelism(1)
     }.handleErrorWith {
       error =>
         IO.raiseError(DataMongoSinkException("error executing the mongo sink: " + error.getMessage, error))

@@ -4,6 +4,7 @@ import java.util.Properties
 
 import cats.effect.IO
 import com.endava.flink.twitter.JobException
+import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
 import com.typesafe.config.ConfigFactory
 import org.apache.flink.configuration.Configuration
 
@@ -30,6 +31,12 @@ class GeneralConfig(generalConfig: IO[com.typesafe.config.Config]) {
   }
 
   case class FlinkConfigException(msg: String, exception: Throwable) extends JobException {
+    override def getMsgException(): String = msg
+
+    override def getException(): Throwable = exception
+  }
+
+  case class MongoConfigException(msg: String, exception: Throwable) extends JobException {
     override def getMsgException(): String = msg
 
     override def getException(): Throwable = exception
@@ -70,6 +77,19 @@ class GeneralConfig(generalConfig: IO[com.typesafe.config.Config]) {
         }.handleErrorWith {
           error =>
             IO.raiseError(KafkaConfigException("error getting the kafka configuration: " + error.getMessage, error))
+        }
+    }
+  }
+
+  def getMongoConfig():IO[MongoSinkConfig] = {
+    generalConfig.flatMap{
+      config =>
+        IO{
+          val mongoConfig = config.getConfig("mongo")
+          MongoSinkConfig("",mongoConfig.getString("db"),mongoConfig.getString("collection"))
+        }.handleErrorWith {
+          error =>
+            IO.raiseError(MongoConfigException("error getting the mongo configuration: " + error.getMessage, error))
         }
     }
   }

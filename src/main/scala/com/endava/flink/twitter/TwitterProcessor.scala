@@ -25,7 +25,8 @@ object TwitterProcessor extends DataTranslate with KafkaConfigurations with Kafk
             kafkaConfig <- generalConfig.getKafkaConfig()
             source <- getSource(kafkaConfig)
             translate <- toTransform(source)
-            sink <- sink(translate)
+            mongoConfig <- generalConfig.getMongoConfig()
+            sink <- sink(translate,mongoConfig)
           } yield sink
           val result = flow.unsafeRunSync()
           env.execute("twitter processor app")
