@@ -4,6 +4,7 @@ import com.endava.flink.twitter.model.TwitterEvent
 import com.endava.flink.twitter.mongo.model.{MongoModel, TwitterEventMongo}
 import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
 import org.apache.flink.configuration.Configuration
+import org.apache.flink.metrics.Counter
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 import org.mongodb.scala.{Completed, MongoClient, MongoCollection, Observable, Observer}
 
@@ -22,8 +23,14 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
 
   var mongoClient: MongoClient = _
 
+  @transient private var outSuccessCounter: Counter = _
+  @transient private var outErrorCounter: Counter = _
+
   override def open(parameters: Configuration): Unit = {
     mongoClient = MongoClient()
+
+    this.outErrorCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outErrorCounter")
+    this.outSuccessCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outSuccessCounter")
   }
 
   override def invoke(event: TwitterEvent, context: SinkFunction.Context[_]): Unit = {
@@ -37,9 +44,16 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
     insertObservable.subscribe {
       new Observer[Completed] {
 
-        override def onError(e: Throwable): Unit = println(s"onError: $e")
+        override def onError(e: Throwable): Unit = {
+          println(s"onError: $e")
+          outErrorCounter.inc()
+        }
 
-        override def onComplete(): Unit = println("onComplete")
+
+        override def onComplete(): Unit = {
+          outSuccessCounter.inc()
+          println("onComplete")
+        }
 
         override def onNext(result: Completed): Unit = println(s"onNext: $result")
       }

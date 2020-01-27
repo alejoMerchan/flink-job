@@ -1,10 +1,12 @@
 package com.endava.flink.twitter
 
-import com.endava.flink.twitter.config.KafkaConfigurations
+import cats.effect.IO
+import com.endava.flink.twitter.config.{GeneralConfig, KafkaConfigurations}
 import com.endava.flink.twitter.sink.DataMongoSink
 import com.endava.flink.twitter.source.KafkaSource
 import com.endava.flink.twitter.transform.DataTranslate
 import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.streaming.api.environment.LocalStreamEnvironment
 import org.apache.flink.streaming.api.scala._
 
 object TwitterProcessor extends DataTranslate with KafkaConfigurations with KafkaSource with DataMongoSink {
@@ -12,36 +14,38 @@ object TwitterProcessor extends DataTranslate with KafkaConfigurations with Kafk
 
   def main(args: Array[String]): Unit = {
 
-    // set up the streaming execution environment
-    implicit val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val generalConfig = GeneralConfig(args)
+    val executeJob = for {
+      flinkConfig <- generalConfig.getFlinkConfig()
+      process <- {
+        IO {
+          implicit val env = new StreamExecutionEnvironment(new LocalStreamEnvironment(flinkConfig))
+          env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
+          val flow = for {
+            kafkaConfig <- generalConfig.getKafkaConfig()
+            source <- getSource(kafkaConfig)
+            translate <- toTransform(source)
+            sink <- sink(translate)
+          } yield sink
+          val result = flow.unsafeRunSync()
+          env.execute("twitter processor app")
+          result
+        }
+      }
+    } yield process
 
-    /**
-      * Event time and watermarks:
-      * Event time: The time at which event occurred on its producing device, we need to specify the way to
-      * assign watermarks and timestamps.
-      * Processing time: Processing time is the time of machine executing the stream of data processing.
-      * Ingestion time: This is time at which a particular event enters Flink.
-      */
-    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
-    val process = for {
-      kafkaConfig <- getConfig("")
-      source <- getSource(kafkaConfig)
-      translate <- toTransform(source)
-      sink <- sink(translate)
-    } yield sink
-
-    process.attempt.map {
+    executeJob.attempt.map {
       case Left(e1) =>
         e1 match {
           case jobException: JobException => println(jobException.getMsgException())
-          case _ => println("other exception")
+          case _ =>
+            println("other exception")
+            e1.printStackTrace()
         }
       case Right(_) => println("sucess execution")
     }.unsafeRunSync()
 
-
-    env.execute("twitter processor app")
   }
 
 

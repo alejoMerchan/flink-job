@@ -17,9 +17,9 @@ trait KafkaConfigurations extends Config[String, KafkaConfig] {
     IO {
       val properties = new Properties()
       properties.setProperty("bootstrap.servers", "localhost:9092")
-      properties.setProperty("group.id", "test")
+      properties.setProperty("group.id", "test-1")
       properties.setProperty("zookeeper.connect", "localhost:2181")
-      KafkaConfig(properties, List("eventos-prueba"))
+      KafkaConfig(properties, List("topic-twitter"))
     }.handleErrorWith {
       error =>
         IO.raiseError(KafkaConfigException("error getting the kafka configuration: " + error.getMessage, error))
