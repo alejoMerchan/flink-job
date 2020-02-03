@@ -6,7 +6,7 @@ import com.endava.flink.twitter.sink.MongoSink.MongoSinkConfig
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.metrics.Counter
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
-import org.mongodb.scala.{Completed, MongoClient, MongoCollection, Observable, Observer}
+import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoCollection, Observable, Observer, ServerAddress}
 
 
 object MongoSink {
@@ -27,7 +27,8 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
   @transient private var outErrorCounter: Counter = _
 
   override def open(parameters: Configuration): Unit = {
-    mongoClient = MongoClient()
+
+    mongoClient = MongoClient("mongodb://mongodb:27017")
 
     this.outErrorCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outErrorCounter")
     this.outSuccessCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outSuccessCounter")

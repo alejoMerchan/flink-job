@@ -9,7 +9,7 @@ object InfluxClient {
 
   case class InfluxDBPoint(measurement: String, timestamp: Long)
 
-  case class InfluxConfig(url: String = "localhost", port: Int = 8086, username: String = "", password: String = "", database: String)
+  case class InfluxConfig(url: String = "influxdb", port: Int = 8086, username: String = "", password: String = "", database: String)
 
   def apply(config: InfluxConfig)(implicit executor: ExecutionContext): InfluxClient = {
     new InfluxClient(InfluxDB.connect(config.url, config.port), config.database)
@@ -24,6 +24,7 @@ class InfluxClient(client: InfluxDB, database: String) {
       Precision.MILLISECONDS,
       Consistency.ALL,
       "custom_rp").recover { case e: WriteException =>
+      e.printStackTrace()
       println(s"There was an error inserting the data. ${e.getMessage}")
     }
   }
@@ -31,6 +32,7 @@ class InfluxClient(client: InfluxDB, database: String) {
   def write(points: List[Point])(implicit executor: ExecutionContext): Unit = {
     client.selectDatabase(database).bulkWrite(points,
       Precision.MILLISECONDS).recover { case e: WriteException =>
+      e.printStackTrace()
       println(s"There was an error inserting the data. ${e.getMessage}")
     }
   }

@@ -22,7 +22,7 @@ class InfluxDBReporter extends AbstractReporter with Scheduled with Client {
   }
 
   override def open(metricConfig: MetricConfig): Unit = {
-    influxClient = InfluxClient(InfluxConfig(database = metricConfig.getString("database", "metrics")))
+    influxClient = InfluxClient(InfluxConfig(url = metricConfig.getString("url","localhost"), database = metricConfig.getString("database", "metrics")))
     filters = getFilters(metricConfig.getString("filter", ""))
     println("--- filters: " + filters)
   }
