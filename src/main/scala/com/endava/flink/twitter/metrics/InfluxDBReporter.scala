@@ -66,7 +66,7 @@ class InfluxDBReporter extends AbstractReporter with Scheduled with Client {
     influxMetrics.map {
       influxMetric =>
         println("publishing: " + influxMetric.filter + " --- "+influxMetric.value)
-        Point(database).addField(influxMetric.filter, influxMetric.value)
+        Point("influx_database_mtrcs").addField(influxMetric.filter, influxMetric.value.toInt)
     }
   }
 
