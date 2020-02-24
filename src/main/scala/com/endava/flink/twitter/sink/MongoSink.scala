@@ -28,7 +28,7 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
 
   override def open(parameters: Configuration): Unit = {
 
-    mongoClient = MongoClient("mongodb://mongodb:27017")
+    mongoClient = MongoClient(config.uri)
 
     this.outErrorCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outErrorCounter")
     this.outSuccessCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outSuccessCounter")
@@ -53,10 +53,9 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
 
         override def onComplete(): Unit = {
           outSuccessCounter.inc()
-          println("onComplete")
         }
 
-        override def onNext(result: Completed): Unit = println(s"onNext: $result")
+        override def onNext(result: Completed): Unit = ""// println(s"onNext: $result")
       }
     }
 

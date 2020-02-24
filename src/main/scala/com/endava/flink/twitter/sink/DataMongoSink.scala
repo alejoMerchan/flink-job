@@ -17,7 +17,7 @@ trait DataMongoSink extends DataSink[TwitterEvent, DataStreamSink[TwitterEvent],
 
   override def sink(stream: DataStream[TwitterEvent],config:MongoSinkConfig): IO[DataStreamSink[TwitterEvent]] = {
     IO {
-      stream.addSink(MongoSink(config)).setParallelism(1)
+      stream.addSink(MongoSink(config))
     }.handleErrorWith {
       error =>
         IO.raiseError(DataMongoSinkException("error executing the mongo sink: " + error.getMessage, error))

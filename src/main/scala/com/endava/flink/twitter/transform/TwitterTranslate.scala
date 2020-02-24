@@ -24,7 +24,7 @@ class TwitterTranslate extends RichMapFunction[String, TwitterEvent] {
   override def map(t: String): TwitterEvent = {
     this.counter.inc()
     val status = TwitterObjectFactory.createStatus(t)
-
+//    print("Record Transformed.." + this.counter.getCount)
     TwitterEvent(status.getUser.getName,
       status.getCreatedAt,
       System.currentTimeMillis(),

@@ -18,7 +18,7 @@ trait KafkaSource extends Source[KafkaConfig, DataStream[String]] {
   override def getSource(in: KafkaConfig)(implicit env: StreamExecutionEnvironment): IO[DataStream[String]] = {
     IO {
       env.addSource(new FlinkKafkaConsumer[String](in.topics.head,
-        new SimpleStringSchema(), in.properties))
+        new SimpleStringSchema(), in.properties)).rebalance
     }.handleErrorWith {
       error =>
         IO.raiseError(KafkaSourceException("error creating the kafka source", error))

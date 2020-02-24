@@ -72,7 +72,6 @@ class GeneralConfig(generalConfig: IO[com.typesafe.config.Config]) {
           val properties = new Properties()
           properties.setProperty("bootstrap.servers", kafkaConfig.getString("servers"))
           properties.setProperty("group.id", kafkaConfig.getString("group.id"))
-          properties.setProperty("zookeeper.connect", kafkaConfig.getString("zookeeper"))
           KafkaConfig(properties, List(kafkaConfig.getString("topic")))
         }.handleErrorWith {
           error =>
