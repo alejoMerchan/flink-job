@@ -28,6 +28,7 @@ class MongoSink(config: MongoSinkConfig) extends RichSinkFunction[TwitterEvent] 
 
   override def open(parameters: Configuration): Unit = {
 
+    println(config.uri)
     mongoClient = MongoClient(config.uri)
 
     this.outErrorCounter = getRuntimeContext.getMetricGroup.addGroup("twitter-metrics").counter("outErrorCounter")

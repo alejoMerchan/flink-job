@@ -13,7 +13,12 @@ object TwitterProcessor extends DataTranslate with KafkaConfigurations with Kafk
   def main(args: Array[String]): Unit = {
 
     val generalConfig = GeneralConfig(args)
+
     implicit val env = StreamExecutionEnvironment.getExecutionEnvironment
+
+    for {
+      flinkConfig <- generalConfig.getFlinkConfig()
+    } yield env.configure(flinkConfig,classOf[Object].getClassLoader)
 
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
     val flow = for {

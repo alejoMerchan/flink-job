@@ -5,8 +5,8 @@ The project includes a script to build a docker image including all job dependen
 Once the image is uploaded it will try to create one job cluster manager and **2** task-managers, this can be configured by modifying the build.sh file and changing arguments named
 `FLINK_JOB_PARALLELISM={numberOfSlaves}`.
 
-The flink version binaries are not included ,  to speed up deployment speed, we need to manually download the flink binaries from
-https://flink.apache.org/downloads.html (flink-1.9.2-bin-scala_2.12.tgz) , and place them in `/container` folder.
+The flink version binaries are not included ,  to speed up deployment speed,the script will download the flink binaries from
+https://flink.apache.org/downloads.html (flink-1.10.0-bin-scala_2.12.tgz) , and place them in `/container` folder.
 
 The job binaries are hardcoded as **flink-job-1.0-SNAPSHOT.jar** this will need to be improved in the future.
 

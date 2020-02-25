@@ -85,7 +85,7 @@ class GeneralConfig(generalConfig: IO[com.typesafe.config.Config]) {
       config =>
         IO{
           val mongoConfig = config.getConfig("mongo")
-          MongoSinkConfig("",mongoConfig.getString("db"),mongoConfig.getString("collection"))
+          MongoSinkConfig(mongoConfig.getString("uri"),mongoConfig.getString("db"),mongoConfig.getString("collection"))
         }.handleErrorWith {
           error =>
             IO.raiseError(MongoConfigException("error getting the mongo configuration: " + error.getMessage, error))
