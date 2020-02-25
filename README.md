@@ -21,3 +21,9 @@ task-manager-deployment.yaml
 ```
 
 Metrics are not working in this branch , a way to configure the execution environment to specify metrics config seems to be missing
+
+To run the script run:
+
+```
+sh build.sh
+```
